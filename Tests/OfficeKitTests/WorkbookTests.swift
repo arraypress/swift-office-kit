@@ -34,6 +34,22 @@ struct WorkbookTests {
         #expect(try book.cell("Z99").value == .empty)
     }
 
+    @Test("A workbook set to calculate manually says so")
+    func manualCalculation() throws {
+        let folder = Fixtures.folder()
+        let automatic = folder.appendingPathComponent("auto.xlsx"), manual = folder.appendingPathComponent("manual.xlsx")
+        try Fixtures.xlsx(to: automatic)
+        try Fixtures.xlsx(to: manual, calcMode: "manual")
+        #expect(try !Workbook(contentsOf: automatic).calculatesManually)
+        var book = try Workbook(contentsOf: manual)
+        #expect(book.calculatesManually)
+        // Writing does not change the owner's choice.
+        try book.set("C1", .formula("=B2*2"))
+        let written = folder.appendingPathComponent("manual-out.xlsx")
+        try book.write(to: written)
+        #expect(try Workbook(contentsOf: written).calculatesManually)
+    }
+
     @Test("Every kind of value is written and reads back the same")
     func roundTrips() throws {
         let (url, out) = try book()

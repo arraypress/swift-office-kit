@@ -158,6 +158,20 @@ public struct Workbook: Sendable {
 
     // MARK: - Writing
 
+    /// Whether the workbook is set to calculate only when asked (F9).
+    ///
+    /// Such a workbook keeps its new formulas — and, in LibreOffice, its
+    /// booleans, which it imports as `=TRUE()` — at 0 until someone
+    /// recalculates, whatever `fullCalcOnLoad` says. MEASURED: of 40 real
+    /// workbooks written and opened in LibreOffice 26.8, 39 computed the new
+    /// formula on open; the one that did not (Apache POI's 47504) is set to
+    /// manual. Its mode is the owner's choice, so it is reported, not changed.
+    public var calculatesManually: Bool {
+        guard let document = try? package.xml("xl/workbook.xml"),
+              let calc = document.rootElement()?.child(named: "calcPr") else { return false }
+        return calc.attribute("calcMode") == "manual"
+    }
+
     /// Writes one cell.
     ///
     /// - Throws: ``OfficeError/badReference(_:)``, ``OfficeError/noSuchSheet(_:)``,

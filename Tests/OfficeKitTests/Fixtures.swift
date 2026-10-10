@@ -80,7 +80,8 @@ enum Fixtures {
 
     /// A workbook: one styled sheet with shared strings, a second sheet, a
     /// defined name and a calculation chain.
-    static func xlsx(to url: URL) throws {
+    static func xlsx(to url: URL, calcMode: String? = nil) throws {
+        let calc = calcMode.map { #"<calcPr calcMode="\#($0)"/>"# } ?? ""
         try zip([
             ("[Content_Types].xml", """
             <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -92,7 +93,7 @@ enum Fixtures {
             """),
             ("xl/workbook.xml", """
             <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-            <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><workbookPr/><sheets><sheet name="Budget" sheetId="1" r:id="rId1"/><sheet name="Notes" sheetId="2" r:id="rId2"/></sheets><definedNames><definedName name="Total">Budget!$B$5</definedName></definedNames></workbook>
+            <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><workbookPr/><sheets><sheet name="Budget" sheetId="1" r:id="rId1"/><sheet name="Notes" sheetId="2" r:id="rId2"/></sheets><definedNames><definedName name="Total">Budget!$B$5</definedName></definedNames>\(calc)</workbook>
             """),
             ("xl/_rels/workbook.xml.rels", """
             <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

@@ -86,11 +86,28 @@ XML part parse, no placeholder is left but the allowed ones, every value put in
 is in the text — or, for a workbook, every cell written reads back as written.
 A copy that fails is deleted and `OfficeError.unverified` says why.
 
+## Opened in LibreOffice (0.1.1)
+
+The same outputs, opened headless by LibreOffice 26.8:
+
+- **Word:** all 43 filled templates rendered to PDF. Every filled value
+  appears in 42; the 43rd is docxtemplater's deliberately malformed
+  "paragraph in a paragraph" test, whose nested paragraph LibreOffice drops.
+  The `{{` left on the page are loop and condition syntax (`{{#items}}`, 108)
+  and docxtemplater's error and expression tests (3) — none a plain
+  placeholder.
+- **Excel:** 39 of 40 workbooks showed all five written cells — and
+  LibreOffice *computed* the new `=AA1*2` on open, so `fullCalcOnLoad` works.
+  The 40th is set to calculate **manually** (`calcMode="manual"`): LibreOffice
+  honours that, so the formula — and the boolean, which it imports as
+  `=TRUE()` — showed 0 until recalculated. The mode is the owner's choice;
+  `Workbook.calculatesManually` reports it so a caller can say so.
+
 ## Not done
 
 Recalculating formulas; extending an Excel table (ListObject) when rows are
 appended below it; `{{…}}` in spreadsheet text; placeholders inside fields or
-comments. LibreOffice was not available to test against here.
+comments; loops and conditions.
 
 ## Layout
 
